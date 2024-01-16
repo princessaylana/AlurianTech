@@ -1,0 +1,23 @@
+{
+  "aluriantech_gui.dronebox.sendbutton":"Send",
+  "itemgroup.aluriantech": "Alurian Tech",
+
+  "block.aluriantech.dronebox": "DroneBox Block",
+  "block.aluriantech.atcore_block": "AI Core Block",
+  "block.aluriantech.dronebox_block.screen": "DroneBox",
+  "block.aluriantech.dronebox.screen": "DroneBox:",
+
+  "block.aluriantech.dronebox.info": "Drone Communication Block",
+  "block.aluriantech.dronebox.test": "Success Test",
+  "block.aluriantech.dronebox.tooltip": "Personalized DroneBox for Drones",
+  "block.aluriantech.dronebox.tooltip2": "Only you can open or Sneak break your DroneBox",
+
+  "message.aluriantech.dronebox_block.break": "You Cannot Break the Block",
+  "message.aluriantech.dronebox_block.granted": "Access Granted",
+  "message.aluriantech.dronebox_block.denied": "Access Denied",
+  "message.aluriantech.dronebox": "DroneBox Owner",
+  "message.aluriantech.dronebox.test":"Testing Success",
+
+  "key.dronebox.shift": "Press Shift for Info"
+
+}

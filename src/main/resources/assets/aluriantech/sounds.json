@@ -1,0 +1,23 @@
+{
+  "drillrig_idle": {
+    "subtitle": "sounds.aluriantech.drillrig_idle",
+    "sounds": [
+      "aluriantech:drillrig_idle"
+    ],
+    "volume":"0.15"
+  },
+  "drillrig_laser": {
+    "subtitle": "sounds.aluriantech.drillrig_laser",
+    "sounds": [
+      "aluriantech:drillrig_laser"
+    ],
+    "volume":"0.15"
+  },
+  "drillrig_move": {
+    "subtitle": "sounds.aluriantech.drillrig_move",
+    "sounds": [
+      "aluriantech:drillrig_move"
+    ],
+    "volume":"0.15"
+  }
+}

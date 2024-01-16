@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "aluriantech:block/dronebox/atcoreblock_front",
+    "side": "aluriantech:block/dronebox/dronebox_side",
+    "top": "aluriantech:block/dronebox/dronebox_top"
+  }
+}
