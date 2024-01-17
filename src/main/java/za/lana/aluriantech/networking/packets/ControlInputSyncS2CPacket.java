@@ -8,16 +8,16 @@ import net.minecraft.util.Identifier;
 import za.lana.aluriantech.AlurianTech;
 import za.lana.aluriantech.entity.machine.DrillRigEntity;
 
-//KeyInputSyncS2CPacket
+
 public class ControlInputSyncS2CPacket {
-    public static final Identifier KEY_INPUT_SYNC_PACKET = new Identifier(AlurianTech.MOD_ID, "key_input_sync_packet");
+    public static final Identifier AT_KEY_INPUT_SYNC_PACKET = new Identifier(AlurianTech.MOD_ID, "at_key_input_sync_packet");
     public static void send(ServerPlayerEntity player, DrillRigEntity drillRig) {
-        if (drillRig.canBeOperatedByPlayer()) {
+        if (drillRig.hasControllingPassenger()) {
             PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
-            buf.writeBoolean(drillRig.isDrillKeyPressed); //0 - jump
+            buf.writeBoolean(drillRig.isDrillKeyPressed);
             buf.writeInt(drillRig.getId());
-            ServerPlayNetworking.send(player, KEY_INPUT_SYNC_PACKET, buf);
-            //System.out.println("DrillRig:KEY_C2S_INPUT_SYNC_PACKET");
+            ServerPlayNetworking.send(player, AT_KEY_INPUT_SYNC_PACKET, buf);
+
         }
     }
 }

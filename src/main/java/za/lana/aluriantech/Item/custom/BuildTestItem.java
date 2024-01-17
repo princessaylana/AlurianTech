@@ -24,16 +24,11 @@ public class BuildTestItem extends Item {
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
         //needs to send below in a packet to server
-        //World level = context.getWorld();
-        if(context.getWorld() == level) {
-            BlockPos positionClicked = context.getBlockPos();
-            PlayerEntity player = context.getPlayer();
-            //World level = context.getWorld();
+        BlockPos positionClicked = context.getBlockPos();
+        PlayerEntity player = context.getPlayer();
+        assert player != null;
+        if(player.getWorld().isClient)
             ClientPlayNetworking.send(AlurianTechPackets.BUILD_STRUCTURE_CS_SYNCPACKET, PacketByteBufs.create());
-
-
-
-        }
         //context.getStack().damage(1, context.getPlayer(), playerEntity -> playerEntity.sendToolBreakStatus(playerEntity.getActiveHand()));
         return ActionResult.SUCCESS;
     }

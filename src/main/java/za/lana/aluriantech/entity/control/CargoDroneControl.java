@@ -4,26 +4,20 @@
 package za.lana.aluriantech.entity.control;
 
 import net.minecraft.entity.ai.control.MoveControl;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.WorldView;
 import za.lana.aluriantech.entity.drones.CargoDroneEntity;
 
 public class CargoDroneControl
         extends MoveControl {
     private final CargoDroneEntity cdrone;
 
-    private final int maxPitchChange;
-    private final boolean noGravity;
     private int hoverDuration;
 
     public CargoDroneControl(CargoDroneEntity cdrone, int maxPitchChange, boolean noGravity) {
         super(cdrone);
         this.cdrone = cdrone;
-        this.maxPitchChange = maxPitchChange;
-        this.noGravity = noGravity;
     }
 
     @Override
@@ -52,12 +46,6 @@ public class CargoDroneControl
             if (this.cdrone.getWorld().isSpaceEmpty(this.cdrone, body)) continue;
             return false;
         }
-        /**
-        if (!this.cdrone.isInLandingPose()){
-            //this.cdrone.setBump(true);
-            return true;
-        }
-         **/
         return !this.cdrone.isInLandingPose();
     }
 }

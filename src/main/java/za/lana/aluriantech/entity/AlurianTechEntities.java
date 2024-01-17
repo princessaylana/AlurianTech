@@ -33,5 +33,4 @@ public class AlurianTechEntities {
     public static void registerModEntities() {
         AlurianTech.LOGGER.info("Registering LivingEntities" + AlurianTech.MOD_ID);
     }
-
 }

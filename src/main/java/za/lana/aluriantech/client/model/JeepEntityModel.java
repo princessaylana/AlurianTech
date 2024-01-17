@@ -1,3 +1,7 @@
+// Made with Blockbench 4.9.1
+// Exported for Minecraft version 1.17+ for Yarn
+// Paste this class into your mod and generate all required imports
+// Lana 2024
 package za.lana.aluriantech.client.model;
 
 import net.minecraft.client.model.*;
@@ -9,9 +13,7 @@ import za.lana.aluriantech.client.animation.JeepAnimations;
 import za.lana.aluriantech.entity.machine.DrillRigEntity;
 import za.lana.aluriantech.entity.transport.JeepEntity;
 
-// Made with Blockbench 4.9.1
-// Exported for Minecraft version 1.17+ for Yarn
-// Paste this class into your mod and generate all required imports
+
 public class JeepEntityModel<T extends JeepEntity> extends SinglePartEntityModel<T> {
 	private final ModelPart jeep;
 	public JeepEntityModel(ModelPart root) {

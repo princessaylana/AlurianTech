@@ -1,7 +1,7 @@
-/**
- * Lana 2024
- */
-
+// Made with Blockbench 4.9.1
+// Exported for Minecraft version 1.17+ for Yarn
+// Paste this class into your mod and generate all required imports
+// Lana 2024
 package za.lana.aluriantech.client.model;
 
 import net.minecraft.client.model.*;
@@ -75,9 +75,6 @@ public class CargoDroneModel<T extends CargoDroneEntity> extends SinglePartEntit
 		this.animateMovement(CargoDroneAnimations.CARGODRONE_FLY, limbSwing, limbSwingAmount, 2f, 2.5f);
 		this.updateAnimation(entity.idleAniState, CargoDroneAnimations.CARGODRONE_IDLE, ageInTicks, 1f);
 		this.updateAnimation(entity.landAniState, CargoDroneAnimations.CARGODRONE_LAND, ageInTicks, 1f);
-	}
-
-	public void setHeadAngles(float headYaw, float headPitch){
 	}
 
 	@Override

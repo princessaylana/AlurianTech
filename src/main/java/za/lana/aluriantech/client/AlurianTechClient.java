@@ -31,11 +31,6 @@ import static za.lana.aluriantech.AlurianTech.LOGGER;
 public class AlurianTechClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
-        AlurianTechPackets.registerS2CPackets();
-        KeyInputHandler.register();
-        ControlInputPacket.init();
-        ControlInputSyncPacket.init();
-        Vec3SyncPacket.init();
         //
         EntityModelLayerRegistry.registerModelLayer(AlurianTechModelLayers.CARGODRONE, CargoDroneModel::getTexturedModelData);
         EntityRendererRegistry.register(AlurianTechEntities.CARGODRONE, CargoDroneRenderer::new);
@@ -44,8 +39,15 @@ public class AlurianTechClient implements ClientModInitializer {
         EntityModelLayerRegistry.registerModelLayer(AlurianTechModelLayers.JEEP, JeepEntityModel::getTexturedModelData);
         EntityRendererRegistry.register(AlurianTechEntities.JEEP, JeepRenderer::new);
         //
+        KeyInputHandler.register();
+
         HandledScreens.<DroneBoxDescription, CottonInventoryScreen<DroneBoxDescription>>register(
                 AlurianTechScreens.DRONEBOX_GUI, DroneBoxBlockScreen::new);
+
+        ControlInputPacket.init();
+        ControlInputSyncPacket.recieve();
+        Vec3SyncPacket.recieve();
+        AlurianTechPackets.registerS2CPackets();
 
         LOGGER.info(AlurianTech.MOD_ID + "Client Initialized");
     }

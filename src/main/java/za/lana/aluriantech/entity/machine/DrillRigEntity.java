@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.ObjectListIterator;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.ParticleUtil;
@@ -28,7 +29,10 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Style;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Util;
 import net.minecraft.util.collection.DefaultedList;
@@ -69,11 +73,13 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
     private int drillAniTimeout = 0;
     //private int drillTick = 0;
     private int drillCooldown = 0;
-    public boolean isDrillKeyPressed = false;
+    
     private final Direction facing;
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(8, ItemStack.EMPTY);
     private static final TrackedData<Boolean> CONSUMING_FUEL = DataTracker.registerData(DrillRigEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    private static final TrackedData<Boolean> DRILLING = DataTracker.registerData(DrillRigEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+   // private static final TrackedData<Boolean> DRILLING = DataTracker.registerData(DrillRigEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private boolean isFlyDownPressed;
+    public boolean isDrillKeyPressed = false;
 
     // MAIN CONSTRUCTOR
     public DrillRigEntity(EntityType<? extends AnimalEntity> entityType, World world) {
@@ -100,13 +106,13 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
             --this.idleAniTimeout;
         }
         // DRILLING ANIMATION
-        if(this.isDrilling() && drillAniTimeout <= 0) {
+        if(isDrillKeyPressed && drillAniTimeout <= 0) {
             drillAniTimeout = 40;
             drillAniState.start(this.age);
         } else {
             --this.drillAniTimeout;
         }
-        if(!this.isDrilling()) {
+        if(!this.isDrillKeyPressed) {
             drillAniState.stop();
         }
     }
@@ -125,24 +131,25 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
         World level = this.getWorld();
         if(level.isClient()) {
             setupAnimationStates();
-            if (getControllingPassenger() == MinecraftClient.getInstance().player){
-                isDrillKeyPressed = KeyInputHandler.drillKey.isPressed();
-                // if fuel, play idle
-            }
+         }
+        if (getWorld().isClient() && getControllingPassenger() == MinecraftClient.getInstance().player) {
+            isDrillKeyPressed = KeyInputHandler.drillKey.isPressed();
         }
-        if (level instanceof ServerWorld world && canBeOperatedByPlayer())
+        if (getWorld() instanceof ServerWorld world && canBeOperatedByPlayer())
             for (ServerPlayerEntity player : PlayerLookup.tracking(world, getBlockPos())) {
                 ControlInputSyncS2CPacket.send(player, this);
                 Vec3SyncS2CPacket.send(player, this);
             }
-        //
+        boolean isDrillKeyPressed = this.isDrillKeyPressed;
+        if (isDrillKeyPressed){
+            scanAndBreakBlocks();
+        }
     }
     // DATA
     @Override
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(CONSUMING_FUEL, false);
-        this.dataTracker.startTracking(DRILLING, false);
     }
     // DATA - BOOLEANS
     public void setConsumingFuel(boolean consumingFuel) {
@@ -151,12 +158,7 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
     public boolean isConsumingFuel() {
         return this.dataTracker.get(CONSUMING_FUEL);
     }
-    public void setDrilling(boolean drilling) {
-        this.dataTracker.set(DRILLING, drilling);
-    }
-    public boolean isDrilling() {
-        return this.dataTracker.get(DRILLING);
-    }
+
     // NBT
     @Override
     public void writeCustomDataToNbt(NbtCompound nbtData) {
@@ -244,21 +246,9 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
                     newSpeed *= 2; // Change this to ~1.5 or so
                 }
                 this.setMovementSpeed(newSpeed);
-                //
                 super.travel(new Vec3d(f, movementInput.y, f1));
             }
-            //TODO
-            boolean isDrillKeyPressed = this.isDrillKeyPressed;
-            if (isDrillKeyPressed) {
-                System.out.println("DrillRig:Drilling Mode On");
-                this.playSound(AlurianTechSounds.DRILLRIG_LASER, 1.0f, 1.0f);
-                this.setDrilling(true);
-                this.scanAndBreakBlocks();
-                // START TIMER
-                //drillingTimer();
-            }else {
-                    this.setDrilling(false);
-            }
+
         } else {
             super.travel(movementInput);
         }
@@ -329,63 +319,77 @@ public class DrillRigEntity extends AnimalEntity implements Mount, ImplementedIn
         setRotation(yaw, getPitch());
     }
 
-    private void scanAndBreakBlocks(){
+    public void scanAndBreakBlocks(){
         // onhorizontalcollision
         World level = this.getWorld();
         if (!level.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
             return;
         }
-        if (this.isDrilling() && level.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
-            if (drillAniTimeout == 20){
-                boolean breakTheseBlocks = false;
-                // double maxDistance, float tickDelta, boolean includeFluids
-                Vec3d rayCast = this.raycast(8, 10,false).getPos();
-                Box box = new Box(rayCast, new Vec3d(rayCast.getX(), rayCast.getY() -1, rayCast.getZ())).expand(1.0, 0.75,0.0);
-                //Box box = this.getBoundingBox().expand(0.2).offset(0.0,0.0, zZ);
-                Iterator<BlockPos> scanPos = BlockPos.iterate(
-                            MathHelper.floor(box.minX),
-                            MathHelper.floor(box.minY),
-                            MathHelper.floor(box.minZ),
-                            MathHelper.floor(box.maxX),
-                            MathHelper.floor(box.maxY),
-                            MathHelper.floor(box.maxZ))
-                    .iterator();
-                //
-                label60:
-                while(true) {
-                    BlockPos blockPos;
-                    Block block;
-                    BlockState blockState;
+        if (!level.isClient) {
+            if (level.getGameRules().getBoolean(GameRules.DO_MOB_GRIEFING)) {
+                if (this.isAlive()) {
+                    boolean breakTheseBlocks = false;
+                    // double maxDistance, float tickDelta, boolean includeFluids
+                    Vec3d rayCast = this.raycast(8, 10, false).getPos();
+                    Box box = new Box(rayCast, new Vec3d(rayCast.getX(), rayCast.getY() - 1, rayCast.getZ())).expand(1.0, 0.75, 0.0);
+                    //Box box = this.getBoundingBox().expand(0.2).offset(0.0,0.0, zZ);
+                    Iterator<BlockPos> scanPos = BlockPos.iterate(
+                                    MathHelper.floor(box.minX),
+                                    MathHelper.floor(box.minY),
+                                    MathHelper.floor(box.minZ),
+                                    MathHelper.floor(box.maxX),
+                                    MathHelper.floor(box.maxY),
+                                    MathHelper.floor(box.maxZ))
+                            .iterator();
                     //
-                    do {
-                        if (!scanPos.hasNext()) {
-                            if (!breakTheseBlocks && this.isOnGround()) {
-                                this.jump();
-                                return;
+                    label60:
+                    while (true) {
+                        BlockPos blockPos;
+                        Block block;
+                        BlockState blockState;
+                        //
+                        do {
+                            if (!scanPos.hasNext()) {
+                                if (!breakTheseBlocks && this.isOnGround()) {
+                                    this.jump();
+                                    return;
+                                }
+                                break label60;
                             }
-                            break label60;
-                        }
-                        blockPos = scanPos.next();
-                        blockState = this.getWorld().getBlockState(blockPos);
-                        block = blockState.getBlock();
+                            blockPos = scanPos.next();
+                            blockState = this.getWorld().getBlockState(blockPos);
+                            block = blockState.getBlock();
 
-                    } //while (!(blockState.isOf(Blocks.GRASS_BLOCK)));
-                    while (!(blockState.isOf(Blocks.GRASS_BLOCK))
-                            && !(blockState.isOf(Blocks.DIRT))
-                            && !(blockState.isOf(Blocks.STONE))
-                            && !(blockState.isIn(BlockTags.PICKAXE_MINEABLE))
-                            && !(blockState.isIn(BlockTags.SHOVEL_MINEABLE))
-                            && !(blockState.isIn(BlockTags.NEEDS_STONE_TOOL))
-                            && !(blockState.isIn(BlockTags.NEEDS_IRON_TOOL))
-                            && !(blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL))
-                    );
-                    breakTheseBlocks = level.breakBlock(blockPos, true, this) || breakTheseBlocks;
-                    level.syncWorldEvent(2001, blockPos, Block.getRawIdFromState(level.getBlockState(blockPos)));
-                    playDrillEffects();
-                    AlurianTech.LOGGER.info("Drilling Success " + AlurianTech.MOD_ID);
+                        } //while (!(blockState.isOf(Blocks.GRASS_BLOCK)));
+                        while (!(blockState.isOf(Blocks.GRASS_BLOCK))
+                                && !(blockState.isOf(Blocks.DIRT))
+                                && !(blockState.isOf(Blocks.STONE))
+                                && !(blockState.isIn(BlockTags.PICKAXE_MINEABLE))
+                                && !(blockState.isIn(BlockTags.SHOVEL_MINEABLE))
+                                && !(blockState.isIn(BlockTags.NEEDS_STONE_TOOL))
+                                && !(blockState.isIn(BlockTags.NEEDS_IRON_TOOL))
+                                && !(blockState.isIn(BlockTags.NEEDS_DIAMOND_TOOL))
+                        );
+                        // bl = this.getWorld().breakBlock(blockPos, true, this) || bl;
+                        //breakTheseBlocks = level.breakBlock(blockPos, true, this, 64) || breakTheseBlocks;
+                        breakTheseBlocks = level.breakBlock(blockPos, true, this) || breakTheseBlocks;
+                        level.syncWorldEvent(2001, blockPos, Block.getRawIdFromState(level.getBlockState(blockPos)));
+
+                        //breakTheseBlocks = getWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState()) || breakTheseBlocks;
+                        //getWorld().setBlockState(blockPos, Blocks.AIR.getDefaultState());
+                        //Block.dropStacks(blockState, getWorld(), blockPos, null, this, ItemStack.EMPTY);
+                        //level.setBlockState(blockPos, Blocks.AIR.getDefaultState());
+                        // needs drops
+                    }
                 }
             }
-        }//
+        }
+        PlayerEntity player = (PlayerEntity) this.getControllingPassenger();
+        if (level.isClient) {
+            player.sendMessage(Text.literal("Success").fillStyle(
+                    Style.EMPTY.withColor(Formatting.GREEN)), true);
+        }
+        playDrillEffects();
     }
     public void playDrillEffects() {
         if (this.getWorld().isClient) {

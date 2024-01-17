@@ -12,8 +12,6 @@ public class AlurianTechSounds {
     public static SoundEvent DRILLRIG_LASER= registerSoundEvent("drillrig_laser");
     public static SoundEvent DRILLRIG_MOVE = registerSoundEvent("drillrig_move");
 
-
-
     private static SoundEvent registerSoundEvent(String name){
         Identifier id = new Identifier(AlurianTech.MOD_ID, name);
         return Registry.register(Registries.SOUND_EVENT, id, SoundEvent.of(id));

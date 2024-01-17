@@ -11,7 +11,7 @@ import net.minecraft.network.PacketByteBuf;
 import za.lana.aluriantech.entity.machine.DrillRigEntity;
 import za.lana.aluriantech.networking.packets.ControlInputC2SPacket;
 
-// KeyInputPacket
+
 @Environment(EnvType.CLIENT)
 public class ControlInputPacket {
     public static void init() {
@@ -22,7 +22,7 @@ public class ControlInputPacket {
                     PacketByteBuf buf = new PacketByteBuf(Unpooled.buffer());
                     buf.writeBoolean(drillRig.isDrillKeyPressed);
                     buf.writeInt(drillRig.getId());
-                    ClientPlayNetworking.send(ControlInputC2SPacket.KEY_INPUT_PACKET, buf);
+                    ClientPlayNetworking.send(ControlInputC2SPacket.AT_KEY_INPUT_PACKET, buf);
                     //System.out.println("DrillRig:KEY_INPUT_PACKET");
                 }
         });

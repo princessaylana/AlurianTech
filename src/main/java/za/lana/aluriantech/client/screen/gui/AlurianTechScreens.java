@@ -12,7 +12,6 @@ import net.minecraft.util.Identifier;
 import za.lana.aluriantech.AlurianTech;
 
 public class AlurianTechScreens {
-
     //
     public static ScreenHandlerType<DroneBoxDescription> DRONEBOX_GUI =
             Registry.register(Registries.SCREEN_HANDLER,  new Identifier(AlurianTech.MOD_ID, "dronebox_gui"),

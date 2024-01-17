@@ -1,3 +1,6 @@
+// Made with Blockbench 4.9.1
+// Exported for Minecraft version 1.17+ for Yarn
+// Paste this class into your mod and generate all required imports
 package za.lana.aluriantech.client.model;
 
 import net.minecraft.client.model.*;
@@ -11,9 +14,7 @@ import za.lana.aluriantech.client.animation.DrillRigAnimations;
 import za.lana.aluriantech.entity.drones.CargoDroneEntity;
 import za.lana.aluriantech.entity.machine.DrillRigEntity;
 
-// Made with Blockbench 4.9.1
-// Exported for Minecraft version 1.17+ for Yarn
-// Paste this class into your mod and generate all required imports
+
 public class DrillRigEntityModel <T extends DrillRigEntity> extends SinglePartEntityModel<T> {
 	private final ModelPart drillRig;
 	public DrillRigEntityModel(ModelPart root) {

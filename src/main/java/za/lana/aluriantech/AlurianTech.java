@@ -19,6 +19,7 @@ import za.lana.aluriantech.entity.transport.JeepEntity;
 import za.lana.aluriantech.networking.AlurianTechPackets;
 import za.lana.aluriantech.networking.packets.ControlInputC2SPacket;
 import za.lana.aluriantech.sound.AlurianTechSounds;
+import za.lana.aluriantech.tag.ModBlockTags;
 
 public class AlurianTech implements ModInitializer {
 
@@ -27,16 +28,11 @@ public class AlurianTech implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
+		AluriantechItems.registerAlurianTechItems();
 		AlurianTechBlocks.registerAlurianTechBlocks();
+		AlurianTechItemGroup.registerAlurianTechItemGroup();
 		AlurianTechBlockEntities.registerBlockEntities();
 		AlurianTechBlockEntities.registerLibGuiBlockEntities();
-
-		AluriantechItems.registerAlurianTechItems();
-		AlurianTechItemGroup.registerAlurianTechItemGroup();
-
-		AlurianTechScreens.registerGuiScreens();
-		AlurianTechPackets.registerC2SPackets();
-
 		AlurianTechSounds.registerModSounds();
 
 		FabricDefaultAttributeRegistry.register(AlurianTechEntities.CARGODRONE, CargoDroneEntity.setAttributes());
@@ -44,7 +40,10 @@ public class AlurianTech implements ModInitializer {
 		FabricDefaultAttributeRegistry.register(AlurianTechEntities.JEEP, JeepEntity.setAttributes());
 
 		ControlInputC2SPacket.init();
+		AlurianTechPackets.registerC2SPackets();
+		AlurianTechScreens.registerGuiScreens();
 
+		ModBlockTags.registerModBlockTags();
 		LOGGER.info("Main Init Success " + MOD_ID);
 	}
 }

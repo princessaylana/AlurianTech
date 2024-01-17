@@ -1,7 +1,7 @@
 /**
  * Lana 2024
  */
-package za.lana.aluriantech.client.networking;
+package za.lana.aluriantech.networking.packets;
 
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
 import net.minecraft.block.BlockState;
@@ -33,17 +33,20 @@ public class BuildStructureC2SPacket {
         //BlockEntity blockEntity = level.getBlockEntity(location);
 
         // Lets Test CustomStructureAPI
-        StructurePlacerAPI placer = new StructurePlacerAPI((ServerWorld) player.getWorld(),
-                new Identifier(AlurianTech.MOD_ID, "core_structure_00"),
-                player.getBlockPos(),
-                BlockMirror.NONE,
-                BlockRotation.CLOCKWISE_90,
-                true, 1.0f,
-                new BlockPos(location.getX(), location.getY(), location.getZ()));
+        // Just to make sure
+        if (!level.isClient) {
+            StructurePlacerAPI placer = new StructurePlacerAPI((ServerWorld) player.getWorld(),
+                    new Identifier(AlurianTech.MOD_ID, "core_structure_00"),
+                    player.getBlockPos(),
+                    BlockMirror.NONE,
+                    BlockRotation.CLOCKWISE_90,
+                    true, 1.0f,
+                    new BlockPos(location.getX(), location.getY(), location.getZ()));
 
-        placer.loadStructure();
-        placer.place(new StructureTemplate());
-        placer.unloadStructure();
+            placer.loadStructure();
+            placer.place(new StructureTemplate());
+            placer.unloadStructure();
+        }
         System.out.println("BuildItem:Building Success!");
     }
 }
